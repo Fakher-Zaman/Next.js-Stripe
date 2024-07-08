@@ -1,24 +1,28 @@
-'use client';
+import {
+    CardElement,
+    PaymentElement,
+    PaymentRequestButtonElement,
+    useElements,
+    useStripe,
+} from "@stripe/react-stripe-js";
+import React, { useState } from "react";
 
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import React, { useState } from 'react';
-
-const PaymentForm = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+function PaymentForm() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
     const stripe = useStripe();
     const elements = useElements();
 
-    const createSubscription = async (e) => {
+    const createSubscription = async () => {
         try {
             const paymentMethod = await stripe.createPaymentMethod({
-                type: 'card',
-                card: elements.getElement('card'),
+                card: elements.getElement("card"),
+                type: "card",
             });
-            const response = await fetch('/api/subscribe', {
-                method: 'POST',
+            const response = await fetch("http://localhost:3000/api/subscribe", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     name,
@@ -26,47 +30,38 @@ const PaymentForm = () => {
                     paymentMethod: paymentMethod.paymentMethod.id,
                 }),
             });
-            if(!response.ok) return alert("Something went wrong! Please try again.");
+            if (!response.ok) return alert("Payment unsuccessful!");
             const data = await response.json();
             const confirm = await stripe.confirmCardPayment(data.clientSecret);
-            if(confirm.error) return alert("Payment failed! " + confirm.error.message);
-            alert("Payment successful!");
-        } catch (error) {
-            console.log(error);
-            alert("Payment failed! " + error.message);
+            if (confirm.error) return alert("Payment unsuccessful!");
+            alert("Payment Successful! Subscription active.");
+        } catch (err) {
+            console.error(err);
+            alert("Payment failed! " + err.message);
         }
-    }
+    };
 
     return (
-        <>
-            <form>
-                <div>
-                    Name:{" "}
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </div>
-                <div>
-                    Email:{" "}
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <CardElement />
-                <div>
-                    <button
-                        onClick={createSubscription}
-                    >
-                        Subscribe - 5 INR
-                    </button>
-                </div>
-            </form>
-        </>
-    )
+        <div style={{ width: "40%" }}>
+            Name:{" "}
+            <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+            <br />
+            Email:{" "}
+            <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+            <br />
+            <CardElement />
+            <br />
+            <button onClick={createSubscription}>Subscribe - 5 INR</button>
+        </div>
+    );
 }
 
 export default PaymentForm;
