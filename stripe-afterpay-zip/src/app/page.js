@@ -10,7 +10,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 const Checkout = () => {
   const [amount, setAmount] = useState(1000); // $10.00
-  const [currency, setCurrency] = useState('usd');
+  const [currency, setCurrency] = useState('aud');
   const [paymentMethodType, setPaymentMethodType] = useState('afterpay_clearpay');
 
   return (
