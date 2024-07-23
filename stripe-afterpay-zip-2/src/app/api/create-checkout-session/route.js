@@ -46,19 +46,3 @@ export async function POST(req) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
-
-export async function GET(req) {
-    const { searchParams } = new URL(req.url);
-    const sessionId = searchParams.get('session_id');
-
-    if (!sessionId) {
-        return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
-    }
-
-    try {
-        const session = await stripe.checkout.sessions.retrieve(sessionId);
-        return NextResponse.json(session);
-    } catch (err) {
-        return NextResponse.json({ error: err.message }, { status: 500 });
-    }
-}
