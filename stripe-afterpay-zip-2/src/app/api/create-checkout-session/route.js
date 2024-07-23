@@ -8,7 +8,7 @@ export async function POST(req) {
         const { quantity, shippingDetails } = await req.json();
 
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card', 'afterpay_clearpay', 'zip'],
+            payment_method_types: ['card', 'afterpay_clearpay', 'zip', 'klarna'],
             mode: 'payment',
             line_items: [
                 {
@@ -44,5 +44,22 @@ export async function POST(req) {
         return NextResponse.json({ id: session.id });
     } catch (err) {
         return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
+
+export async function GET(request) {
+    const url = new URL(request.url);
+    const sessionId = url.searchParams.get('session_id');
+
+    if (!sessionId) {
+        return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        return NextResponse.json(session);
+    } catch (error) {
+        console.error('Error retrieving session:', error);
+        return NextResponse.json({ error: 'Failed to retrieve session' }, { status: 500 });
     }
 }
