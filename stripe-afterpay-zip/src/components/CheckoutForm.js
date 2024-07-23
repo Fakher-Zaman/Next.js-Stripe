@@ -58,11 +58,13 @@ const CheckoutForm = ({ amount, currency, paymentMethodType }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='w-[400px]'>
             <PaymentElement options={{ layout: 'tabs' }} />
-            <button type="submit" disabled={isProcessing || !stripe || !elements}>
+            <div className='flex justify-center items-center'>
+            <button type="submit" disabled={isProcessing || !stripe || !elements} className='border bg-teal-500 text-white px-4 py-2 m-6 rounded-md w-[400px]'>
                 {isProcessing ? 'Processing…' : 'Pay Now'}
             </button>
+            </div>
             {message && <div>{message}</div>}
         </form>
     );

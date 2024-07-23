@@ -38,13 +38,14 @@ const Checkout = () => {
     }, [amount, currency, paymentMethodType]);
 
     return (
-        <div>
-            <h1>Checkout</h1>
-            <label>
+        <div className='flex flex-col justify-center items-center p-6 w-full'>
+            <h1 className='text-center text-2xl'>Stripe Checkout</h1>
+            <label className='p-4'>
                 Payment Method:
                 <select
                     value={paymentMethodType}
                     onChange={(e) => setPaymentMethodType(e.target.value)}
+                    className='border border-gray-300 rounded p-2 ml-2'
                 >
                     <option value="afterpay_clearpay">Afterpay</option>
                     <option value="zip">Zip</option>
