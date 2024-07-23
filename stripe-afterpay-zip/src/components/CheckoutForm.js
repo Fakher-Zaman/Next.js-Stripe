@@ -1,11 +1,5 @@
-// components/CheckoutForm.js
-
 import { useState } from 'react';
-import {
-    CardElement,
-    useStripe,
-    useElements,
-} from '@stripe/react-stripe-js';
+import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 
 const CheckoutForm = ({ amount, currency, paymentMethodType }) => {
     const stripe = useStripe();
@@ -18,10 +12,13 @@ const CheckoutForm = ({ amount, currency, paymentMethodType }) => {
         setIsProcessing(true);
 
         if (!stripe || !elements) {
+            setMessage('Stripe has not loaded yet.');
+            setIsProcessing(false);
             return;
         }
 
-        const { error: backendError, clientSecret } = await fetch('/api/create-payment-intent', {
+        // Fetch the client secret from your backend
+        const { clientSecret, error: backendError } = await fetch('/api/create-payment-intent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -35,28 +32,34 @@ const CheckoutForm = ({ amount, currency, paymentMethodType }) => {
             return;
         }
 
-        const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-                card: elements.getElement(CardElement),
-                billing_details: {
-                    name: 'Test User',
+        // Confirm the payment based on the payment method type
+        let result;
+        try {
+            result = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: window.location.href, // Redirect after payment
                 },
-            },
-        });
-
-        if (stripeError) {
-            setMessage(stripeError.message);
+            });
+        } catch (error) {
+            setMessage(error.message);
             setIsProcessing(false);
             return;
         }
 
-        setMessage(`Payment succeeded! PaymentIntent ID: ${paymentIntent.id}`);
+        if (result.error) {
+            setMessage(result.error.message);
+            setIsProcessing(false);
+            return;
+        }
+
+        setMessage(`Payment succeeded! PaymentIntent ID: ${result.paymentIntent.id}`);
         setIsProcessing(false);
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <CardElement options={{ hidePostalCode: true }} />
+            <PaymentElement options={{ layout: 'tabs' }} />
             <button type="submit" disabled={isProcessing || !stripe || !elements}>
                 {isProcessing ? 'Processing…' : 'Pay Now'}
             </button>
