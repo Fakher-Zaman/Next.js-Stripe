@@ -14,7 +14,7 @@ export async function POST(req) {
         };
 
         // Add shipping details if required by payment method
-        if (paymentMethodType === 'afterpay_clearpay' || paymentMethodType === 'zip') {
+        if (paymentMethodType === 'afterpay_clearpay' || paymentMethodType === 'zip' || paymentMethodType === 'klarna') {
             paymentIntentParams = {
                 ...paymentIntentParams,
                 shipping: {

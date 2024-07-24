@@ -50,6 +50,7 @@ const Checkout = () => {
                 >
                     <option value="afterpay_clearpay">Afterpay</option>
                     <option value="zip">Zip</option>
+                    <option value="klarna">Klarna</option>
                 </select>
             </label>
 
