@@ -40,6 +40,7 @@ const Checkout = () => {
     return (
         <div className='flex flex-col justify-center items-center p-6 w-full'>
             <h1 className='text-center text-2xl'>Stripe Checkout</h1>
+            <p className='my-2'>Price: $10.00 AUD</p>
             <label className='p-4'>
                 Payment Method:
                 <select
